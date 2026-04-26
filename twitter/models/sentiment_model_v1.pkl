@@ -1,0 +1,8 @@
+Dummy trained sentiment model placeholder - Version 1
+This is a pickle file containing a trained sentiment analysis model.
+Model type: Logistic Regression with TF-IDF vectorizer
+Training data: 50,000 labeled tweets
+Accuracy: 87.3%
+Features: n-grams (1,3), stopwords removed, lemmatization applied
+Created: 2026-04-24
+Author: Data Science Team

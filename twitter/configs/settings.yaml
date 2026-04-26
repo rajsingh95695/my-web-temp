@@ -1,0 +1,183 @@
+# Twitter Sentiment Analysis Platform Configuration
+# YAML configuration file for production deployment
+
+app:
+  name: "Twitter Sentiment Analysis Platform"
+  version: "2.1.0"
+  environment: "production"
+  debug: false
+  secret_key: "change_this_secure_random_key_in_production"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 30
+  keepalive: 75
+  max_requests: 1000
+  max_requests_jitter: 100
+
+database:
+  postgres:
+    host: "postgres-prod.cluster.example.com"
+    port: 5432
+    database: "sentiment_production"
+    username: "sentiment_user"
+    password: "${DB_PASSWORD}"
+    pool_size: 20
+    max_overflow: 10
+    echo: false
+    
+  redis:
+    host: "redis-cache.example.com"
+    port: 6379
+    database: 0
+    password: "${REDIS_PASSWORD}"
+    decode_responses: true
+    socket_keepalive: true
+
+api:
+  twitter:
+    base_url: "https://api.twitter.com/2"
+    bearer_token: "${TWITTER_BEARER_TOKEN}"
+    timeout: 30
+    max_retries: 3
+    
+  rapidapi:
+    base_url: "https://twitter-api45.p.rapidapi.com"
+    api_key: "${RAPIDAPI_KEY}"
+    timeout: 25
+
+models:
+  vader:
+    enabled: true
+    lexicon_path: "/models/vader_lexicon.txt"
+    
+  random_forest:
+    enabled: true
+    model_path: "/models/random_forest_v2.pkl"
+    vectorizer_path: "/models/tfidf_vectorizer.pkl"
+    
+  bert:
+    enabled: true
+    model_path: "/models/bert_sentiment_v3"
+    tokenizer_path: "/models/bert_tokenizer"
+    max_length: 128
+    batch_size: 32
+    
+  ensemble:
+    weights:
+      vader: 0.2
+      random_forest: 0.3
+      bert: 0.5
+    threshold_positive: 0.05
+    threshold_negative: -0.05
+
+processing:
+  batch_size: 100
+  max_concurrent_batches: 10
+  tweet_processing_timeout: 10
+  cleanup_interval: 3600
+  
+  text_cleaning:
+    remove_urls: true
+    remove_mentions: true
+    remove_hashtags: false
+    lowercase: true
+    remove_punctuation: false
+    remove_numbers: false
+    remove_extra_spaces: true
+
+caching:
+  enabled: true
+  redis_ttl: 3600
+  memory_cache_size: 10000
+  prediction_cache_enabled: true
+  prediction_cache_ttl: 1800
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+      
+    file:
+      enabled: true
+      path: "/var/log/sentiment/app.log"
+      max_size_mb: 100
+      backup_count: 10
+      
+    syslog:
+      enabled: false
+      address: "/dev/log"
+      facility: "local7"
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+    
+  health_checks:
+    enabled: true
+    interval: 30
+    endpoints:
+      - "/health"
+      - "/health/database"
+      - "/health/redis"
+      
+  alerts:
+    email: "alerts@example.com"
+    slack_webhook: "${SLACK_WEBHOOK_URL}"
+    pagerduty_key: "${PAGERDUTY_KEY}"
+
+security:
+  cors:
+    enabled: true
+    origins:
+      - "https://dashboard.example.com"
+      - "https://admin.example.com"
+    methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+    headers:
+      - "Content-Type"
+      - "Authorization"
+      - "X-API-Key"
+      
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    requests_per_hour: 1000
+    redis_key_prefix: "rate_limit"
+    
+  authentication:
+    api_key_enabled: true
+    jwt_enabled: true
+    jwt_secret: "${JWT_SECRET}"
+    jwt_expiry_hours: 24
+
+features:
+  real_time_streaming: true
+  batch_processing: true
+  sentiment_trends: true
+  entity_recognition: false
+  topic_modeling: false
+  multilingual: false
+  export_reports: true
+  
+  notifications:
+    email_alerts: true
+    webhook_notifications: false
+    slack_notifications: true
+
+maintenance:
+  backup_schedule: "0 2 * * *"  # Daily at 2 AM
+  log_rotation_schedule: "0 0 * * *"
+  model_retraining_schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+  cleanup_schedule: "0 4 * * *"
