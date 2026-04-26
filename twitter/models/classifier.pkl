@@ -1,9 +1,0 @@
-Dummy trained classifier model placeholder
-This is a pickle file containing a multi-class classifier.
-Model type: Support Vector Machine (SVM) with RBF kernel
-Classes: Positive, Negative, Neutral, Mixed
-Training data: 75,000 annotated social media posts
-Accuracy: 85.7% (weighted F1-score)
-Features: TF-IDF with custom vocabulary, emotion lexicon scores
-Created: 2026-04-24
-Author: NLP Research Team
